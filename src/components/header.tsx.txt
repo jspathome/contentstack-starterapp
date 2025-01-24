@@ -1,0 +1,143 @@
+'use client'
+
+import React, { useState, useEffect, useMemo } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import parse from 'html-react-parser';
+import Skeleton from 'react-loading-skeleton';
+import { Entry, HeaderProps, NavLinks } from '@/models/layout';
+import Image from 'next/image';
+import { contentstackService, onEntryChange } from '@/xbe/services/ContentstackService ';
+import { Present, Condition, Else } from '@/components/ui/Present';
+
+export default function Header() {
+  const [header, setHeader] = useState<HeaderProps | undefined>(undefined);
+  const [entries, setEntries] = useState<Entry | undefined>(undefined);
+  const pathname = usePathname();
+
+  /**
+   * Fetches the header and entries data concurrently using the contentstackService.
+   * 
+   * This function makes two asynchronous requests in parallel:
+   * 1. Fetches the header data.
+   * 2. Fetches all entries data.
+   * 
+   * Once both requests are completed, it updates the state with the fetched data.
+   * 
+   * @returns {Promise<void>} A promise that resolves when both header and entries data are fetched and state is updated.
+   */
+  const fetchHeaderAndEntries = async () => {
+    console.log('Fetching header and entries concurrently... fetchHeaderAndEntries()');
+    const [headerRes, entriesRes] = await Promise.all([
+      contentstackService.getHeaderRes(),
+      contentstackService.getAllEntries(),
+    ]);
+
+    console.log('Header:', headerRes);
+    console.log('Entries:', entriesRes);
+
+    setHeader(headerRes);
+    setEntries(entriesRes);
+
+    console.log('Header:', headerRes);
+    console.log('Entries:', entriesRes);
+
+  };
+
+  /**
+   * Builds a new navigation menu by comparing the entries with the existing header properties.
+   * If an entry is not found in the current navigation menu, it adds it to the menu.
+   *
+   * @param {Entry} ent - The list of entries to be added to the navigation menu.
+   * @param {HeaderProps} hd - The current header properties containing the navigation menu.
+   * @returns {HeaderProps} - The updated header properties with the new navigation menu.
+   */
+  // function buildNavigation(ent: Entry, hd: HeaderProps) {
+  //   const newHeader = { ...hd };
+  //   if (ent.length !== newHeader.navigation_menu.length) {
+  //     ent.forEach((entry) => {
+  //       const hFound = newHeader.navigation_menu.find(
+  //         (navLink: NavLinks) => navLink.label === entry.title
+  //       );
+  //       if (!hFound) {
+  //         newHeader.navigation_menu.push({
+  //           label: entry.title,
+  //           page_reference: [{ title: entry.title, url: entry.url, $: entry.$ }],
+  //           $: {},
+  //         });
+  //       }
+  //     });
+  //   }
+  //   return newHeader;
+  // }
+
+  /**
+   * Fetches data asynchronously and updates the header state.
+   * 
+   * This function attempts to fetch header data using the `contentstackService.getHeaderRes` method.
+   * If both `header` and `entries` are defined, it builds a new navigation structure using the 
+   * `buildNavigation` function and updates the header state with the new structure.
+   * 
+   * @async
+   * @function fetchData
+   * @throws Will log an error to the console if the fetch operation fails.
+   */
+  // const fetchData = async () => {
+  //   console.log('Fetching data... fetchData()');
+  //   try {
+  //     if (header && entries) {
+  //       console.log('Header and entries are defined.');
+  //       const headerRes = await contentstackService.getHeaderRes();
+  //       const newHeader = buildNavigation(entries, headerRes);
+  //       console.log('New header:', newHeader);
+  //       console.log('headerRes',headerRes)
+  //       setHeader(newHeader);
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   console.log('Fetching data... useEffect()');
+  //   fetchHeaderAndEntries();
+  // }, []);
+
+  // useEffect(() => {
+  //   console.log('Fetching data... useEffect() [header, entries]');
+  //   if (header && entries) {
+  //     onEntryChange(() => fetchData());
+  //   }
+  // }, [header, entries]);
+
+  /**
+   * Memoized computation of the new header based on entries and header.
+   * 
+   * @constant
+   * @name newHeader
+   * @type {ReturnType<typeof buildNavigation> | undefined}
+   * 
+   * @description
+   * Uses the `useMemo` hook to optimize performance by memoizing the result of 
+   * `buildNavigation(entries, header)`. The memoized value is recalculated only 
+   * when `entries` or `header` change. If either `entries` or `header` is not 
+   * provided, it returns `undefined`.
+   * 
+   * @dependencies
+   * - `entries`: The entries used to build the navigation.
+   * - `header`: The header configuration used to build the navigation.
+   */
+  // const newHeader = useMemo(() => {
+  //   if (entries && header) {
+  //     return buildNavigation(entries, header);
+  //   }
+  //   return undefined;
+  // }, [entries, header]);
+
+
+  return (
+    <header className='header'>
+      <h1 className='bg-black text-white p-4'>Header</h1>
+    </header>
+  );
+}

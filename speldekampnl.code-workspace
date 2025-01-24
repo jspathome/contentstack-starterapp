@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../contentstack-academy-playground"
+		}
+	],
+	"settings": {
+		"cSpell.words": [
+			"apikey",
+			"CONTENTSTACK"
+		]
+	}
+}
